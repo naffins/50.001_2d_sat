@@ -10,6 +10,8 @@ import sat.env.*;
 import sat.formula.*;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Scanner;
 
 public class SATSolverTest {
@@ -25,11 +27,44 @@ public class SATSolverTest {
     	try {
     		File cnfFile = new File(args[0]);
     		Scanner cnfReader = new Scanner(cnfFile);
+    		boolean is_preamble = true;
+    		int varCount = 0, clauseCount = 0;
+    		int clauseIter = 0;
+    		LinkedList<String> store = new LinkedList<String>();
+    		ArrayList<Clause> clauses = new ArrayList<Clause>();
     		while(cnfReader.hasNextLine()) {
     			String out = cnfReader.nextLine();
-    			System.out.println(out);
+    			if (is_preamble) {
+    				// Ignore comment
+    				if (out.charAt(0)=='c') continue;
+    				// Process preamble string
+    				String[] problemArgs = out.split(" ",0);
+    				varCount = Integer.parseInt(problemArgs[2]);
+    				clauseCount = Integer.parseInt(problemArgs[3]);
+    				is_preamble = false;
+    			}
+    			else {
+    				String[] parseLits = out.split(" ",0);
+    				for (String e: parseLits) {
+    					if (e.equals("0")) {
+    						parseAndEmpty(store,clauses);
+    						clauseIter++;
+    					}
+    					else {
+    						store.add(e);
+    					}
+    					//System.out.println(e);
+    				}
+    			}
     		}
+    		if ((store.size()>0) && (clauseIter<clauseCount)) parseAndEmpty(store,clauses);
     		cnfReader.close();
+			
+    		Clause[] clauseArray = new Clause[clauses.size()];
+    		clauses.toArray(clauseArray);
+    		
+    		Formula f1 = makeFm(clauseArray);
+    		System.out.println(f1);
     	}
     	// For in case file doesn't exist
     	catch (FileNotFoundException e) {
@@ -77,6 +112,17 @@ public class SATSolverTest {
         return c;
     }
     
-    
+    private static void parseAndEmpty(LinkedList<String> store,ArrayList<Clause> clauses) {
+    	Literal[] curLits = new Literal[store.size()];
+    	int total = store.size();
+    	for (int i=0;i<total;i++) {
+    		String cur = store.removeFirst();
+    		Literal curLit;
+    		if (cur.charAt(0)!='-') curLit = PosLiteral.make(cur);
+    		else curLit = PosLiteral.make(cur.substring(1)).getNegation();
+    		curLits[i] = curLit;
+    	}
+    	clauses.add(makeCl(curLits));
+    }
     
 }
