@@ -1,26 +1,14 @@
 package sat;
 
-/*
-import static org.junit.Assert.*;
-
-import org.junit.Test;
-*/
-
-import sat.env.*;
-import sat.formula.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Scanner;
 
+import immutable.sat.*;
+
 public class SATSolverTest {
-    Literal a = PosLiteral.make("a");
-    Literal b = PosLiteral.make("b");
-    Literal c = PosLiteral.make("c");
-    Literal na = a.getNegation();
-    Literal nb = b.getNegation();
-    Literal nc = c.getNegation();
 
 
     public static void main(String args[]) {
@@ -34,6 +22,7 @@ public class SATSolverTest {
     		ArrayList<Clause> clauses = new ArrayList<Clause>();
     		while(cnfReader.hasNextLine()) {
     			String out = cnfReader.nextLine();
+    			if ((out.isEmpty())||out.equals("\n")) continue;
     			if (is_preamble) {
     				// Ignore comment
     				if (out.charAt(0)=='c') continue;
@@ -60,69 +49,34 @@ public class SATSolverTest {
     		if ((store.size()>0) && (clauseIter<clauseCount)) parseAndEmpty(store,clauses);
     		cnfReader.close();
 			
-    		Clause[] clauseArray = new Clause[clauses.size()];
-    		clauses.toArray(clauseArray);
+    		Formula f = new Formula();
     		
-    		Formula f1 = makeFm(clauseArray);
-    		System.out.println(f1);
+    		//for (Clause c:clauses) System.out.println(c);
+    		for (Clause c:clauses) f = f.addClause(c);
+    		
+    		System.out.println("Executing");
+    		
+    		System.out.println(SATSolver.solve(f));
+    		System.out.println("Executed");
+    		//Clause[] clauseArray = new Clause[clauses.size()];
+    		//clauses.toArray(clauseArray);
     	}
     	// For in case file doesn't exist
     	catch (FileNotFoundException e) {
     		System.out.println("CNF file not found");
     	}
-    	
-    }
-	
-	// TODO: add the main method that reads the .cnf file and calls SATSolver.solve to determine the satisfiability
-    
-	
-    public void testSATSolver1(){
-    	// (a v b)
-    	Environment e = SATSolver.solve(makeFm(makeCl(a,b))	);
-/*
-    	assertTrue( "one of the literals should be set to true",
-    			Bool.TRUE == e.get(a.getVariable())  
-    			|| Bool.TRUE == e.get(b.getVariable())	);
-    	
-*/    	
     }
     
-    
-    public void testSATSolver2(){
-    	// (~a)
-    	Environment e = SATSolver.solve(makeFm(makeCl(na)));
-/*
-    	assertEquals( Bool.FALSE, e.get(na.getVariable()));
-*/    	
-    }
-    
-    private static Formula makeFm(Clause... e) {
-        Formula f = new Formula();
-        for (Clause c : e) {
-            f = f.addClause(c);
-        }
-        return f;
-    }
-    
-    private static Clause makeCl(Literal... e) {
-        Clause c = new Clause();
-        for (Literal l : e) {
-            c = c.add(l);
-        }
-        return c;
-    }
-    
-    private static void parseAndEmpty(LinkedList<String> store,ArrayList<Clause> clauses) {
-    	Literal[] curLits = new Literal[store.size()];
+    public static void parseAndEmpty(LinkedList<String> store, ArrayList<Clause> clauses) {
     	int total = store.size();
+    	Clause newClause = new EmptyClause();
     	for (int i=0;i<total;i++) {
     		String cur = store.removeFirst();
-    		Literal curLit;
-    		if (cur.charAt(0)!='-') curLit = PosLiteral.make(cur);
-    		else curLit = PosLiteral.make(cur.substring(1)).getNegation();
-    		curLits[i] = curLit;
+    		boolean is_positive = !(cur.charAt(0)=='-');
+    		Short value = is_positive? Short.parseShort(cur):Short.parseShort(cur.substring(1));
+    		newClause = newClause.add(value, is_positive);
     	}
-    	clauses.add(makeCl(curLits));
+    	clauses.add(newClause);
     }
     
 }

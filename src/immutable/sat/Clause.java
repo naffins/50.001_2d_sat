@@ -1,21 +1,23 @@
+package immutable.sat;
+
 /**
  * An immutable list interface
  * Designed for illustrating reasoning about immutable types
  * 
  * Copyright 2007 Daniel Jackson and MIT
  */
-package immutable;
 
 import java.util.Iterator;
+import immutable.*;
 
-public interface ImList<E> extends Iterable<E> {
+public abstract class Clause implements ImDoubleList {
     /**
      * @param e
      *            element to add
      * @requires e != null
      * @return [e,e_0,...,e_n] where this list = [e_0,...,e_n]
      */
-    public ImList<E> add(E e);
+    public abstract Clause add(Short sh, boolean bool);
 
     /**
      * Get first element of this list.
@@ -23,7 +25,7 @@ public interface ImList<E> extends Iterable<E> {
      * @requires this list is nonempty
      * @return e_0 where this list = [e_0,...,e_n]
      */
-    public E first();
+    public abstract String first();
 
     /**
      * Get list of all elements of this list except for the first.
@@ -31,37 +33,43 @@ public interface ImList<E> extends Iterable<E> {
      * @requires this list is nonempty
      * @return [e_1,...,e_n] where this list = [e_0,...,e_n]
      */
-    public ImList<E> rest();
+    public abstract Clause rest();
 
     /**
      * Remove the first occurrence of an element from the list, if present.
+     * @param inv_e 
      * 
      * @requires e != null
      * @return [e0,..,e_{i-1], e_{i+1},..,e_n] where i is the minimum index such
      *         that e_i.equals(e); if no such i, then returns [e_0,..,e_n]
      *         unchanged.
      */
-    public ImList<E> remove(E e);
+    public abstract Clause eliminate(String e, String inv_e);
 
     /**
      * @requires e != null
      * @return exists i such that e_i.equals(e) where e_i is ith element of this
      */
-    public boolean contains(E e);
+    public abstract boolean contains(String e);
 
     /**
      * @return number of elements in this
      */
-    public int size();
+    public abstract int size();
 
     /**
      * @return true if this contains no elements
      */
-    public boolean isEmpty();
+    public abstract boolean isEmpty();
 
     /**
      * see Iterable.iterator()
      */
-    public Iterator<E> iterator();
+    
+    public abstract String printer();
+    
+    public abstract Iterator<String> iterator();
+    
+    public abstract boolean equals(Object o);
 
 }

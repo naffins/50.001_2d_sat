@@ -1,21 +1,14 @@
-/**
- * Date: Mar 6, 2008, 1:31:54 PM
- * 6.005 Elements of Software Construction
- * (c) 2008, MIT and Daniel Jackson
- */
 package immutable;
+
 import java.util.Iterator;
 
-/**
- * Implementation of an iterator for immutable lists
- */
-public class ImListIterator<E> implements Iterator<E> {
+public class ImDoubleListIterator implements Iterator<String> {
     /* rep invariant
      * remaining != null
      */
-    ImList<E> remaining;
+    ImDoubleList remaining;
 
-    public ImListIterator (ImList<E> list) {
+    public ImDoubleListIterator (ImDoubleList list) {
         remaining = list;
     }
 
@@ -23,8 +16,8 @@ public class ImListIterator<E> implements Iterator<E> {
         return !remaining.isEmpty();
     }
 
-    public E next () {
-        E first = remaining.first ();
+    public String next () {
+        String first = remaining.first();
         remaining = remaining.rest();
         return first;
     }
