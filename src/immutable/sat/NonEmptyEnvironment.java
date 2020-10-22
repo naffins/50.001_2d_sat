@@ -70,7 +70,8 @@ public class NonEmptyEnvironment extends Environment {
 		Environment cur = this;
 		while (!(cur.isEmpty())) {
 			rt += cur.printer();
-			cur = this.rest;
+			cur = cur.rest();
+			if (!(cur.isEmpty())) rt += ",";
 		}
 		rt += "]";
 		return rt;

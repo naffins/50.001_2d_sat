@@ -27,7 +27,7 @@ public class SATSolverTest {
     				// Ignore comment
     				if (out.charAt(0)=='c') continue;
     				// Process preamble string
-    				String[] problemArgs = out.split(" ",0);
+    				String[] problemArgs = out.split("\\s+",0);
     				varCount = Integer.parseInt(problemArgs[2]);
     				clauseCount = Integer.parseInt(problemArgs[3]);
     				is_preamble = false;
@@ -53,11 +53,14 @@ public class SATSolverTest {
     		
     		//for (Clause c:clauses) System.out.println(c);
     		for (Clause c:clauses) f = f.addClause(c);
-    		
-    		System.out.println("Executing");
-    		
+    		//System.out.println(f);
+    		System.out.println("SAT solver starts!!!");
+    		long started = System.nanoTime();
     		System.out.println(SATSolver.solve(f));
-    		System.out.println("Executed");
+    		long time = System.nanoTime();
+    		long timeTaken= time-started;
+    		System.out.println("Time:" + timeTaken/1000000.0 + "ms");
+    		
     		//Clause[] clauseArray = new Clause[clauses.size()];
     		//clauses.toArray(clauseArray);
     	}
@@ -65,6 +68,7 @@ public class SATSolverTest {
     	catch (FileNotFoundException e) {
     		System.out.println("CNF file not found");
     	}
+		
     }
     
     public static void parseAndEmpty(LinkedList<String> store, ArrayList<Clause> clauses) {
@@ -72,6 +76,7 @@ public class SATSolverTest {
     	Clause newClause = new EmptyClause();
     	for (int i=0;i<total;i++) {
     		String cur = store.removeFirst();
+    		if (cur.isEmpty()) continue;
     		boolean is_positive = !(cur.charAt(0)=='-');
     		Short value = is_positive? Short.parseShort(cur):Short.parseShort(cur.substring(1));
     		newClause = newClause.add(value, is_positive);

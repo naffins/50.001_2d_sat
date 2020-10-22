@@ -78,7 +78,7 @@ public class NonEmptyClause extends Clause {
         for (int i=size();i>0;i--) {
         	out += cur.printer();
         	if (i!=1) out += ",";
-        	cur = this.rest();
+        	cur = cur.rest();
         }
         out += "]";
         return out;
