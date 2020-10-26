@@ -1,75 +1,64 @@
 package immutable.sat;
 
-/**
- * An immutable list interface
- * Designed for illustrating reasoning about immutable types
- * 
- * Copyright 2007 Daniel Jackson and MIT
- */
-
 import java.util.Iterator;
-import immutable.*;
+import java.util.LinkedList;
 
-public abstract class Clause implements ImDoubleList {
-    /**
-     * @param e
-     *            element to add
-     * @requires e != null
-     * @return [e,e_0,...,e_n] where this list = [e_0,...,e_n]
-     */
-    public abstract Clause add(Short sh, boolean bool);
+import immutable.ImList;
+import immutable.ImListIterator;
 
-    /**
-     * Get first element of this list.
-     * 
-     * @requires this list is nonempty
-     * @return e_0 where this list = [e_0,...,e_n]
-     */
-    public abstract String first();
-
-    /**
-     * Get list of all elements of this list except for the first.
-     * 
-     * @requires this list is nonempty
-     * @return [e_1,...,e_n] where this list = [e_0,...,e_n]
-     */
-    public abstract Clause rest();
-
-    /**
-     * Remove the first occurrence of an element from the list, if present.
-     * @param inv_e 
-     * 
-     * @requires e != null
-     * @return [e0,..,e_{i-1], e_{i+1},..,e_n] where i is the minimum index such
-     *         that e_i.equals(e); if no such i, then returns [e_0,..,e_n]
-     *         unchanged.
-     */
-    public abstract Clause eliminate(String e, String inv_e);
-
-    /**
-     * @requires e != null
-     * @return exists i such that e_i.equals(e) where e_i is ith element of this
-     */
-    public abstract boolean contains(String e);
-
-    /**
-     * @return number of elements in this
-     */
-    public abstract int size();
-
-    /**
-     * @return true if this contains no elements
-     */
-    public abstract boolean isEmpty();
-
-    /**
-     * see Iterable.iterator()
-     */
-    
-    public abstract String printer();
-    
-    public abstract Iterator<String> iterator();
-    
-    public abstract boolean equals(Object o);
-
+/**
+ * Immutable sorted list of Literals
+ * @author naffins
+ *
+ */
+public abstract class Clause implements ImList<Literal>{
+	
+	/**
+	 * Add literal to clause in a way that preserves order. Note that this ignores any duplicate literals, and immediately returns a null
+	 * pointer if the negation of an existing literal is added
+	 */
+	public abstract Clause add(Literal l);
+	
+	/**
+	 * Return a null pointer if literal exists in clause, or only the clause without negative of the literal if it exists.
+	 * Note that this is sign-dependent, though it DOES something regardless of whether the sign matches.
+	 */
+	public abstract Clause remove(Literal l);
+	
+	/**
+	 * Check whether sign-dependent literal exists in clause.
+	 */
+	public abstract boolean contains(Literal l);
+	
+	public abstract Literal first();
+	
+	public abstract Clause rest();
+	
+	/**
+	 * Pour out your heart's, sorry, this list's literals content into a LinkedList.
+	 * Useful for updating literals availability table.
+	 * @return a LinkedList
+	 */
+	public abstract LinkedList<Literal> contents();
+	
+	public abstract int length();
+	
+	public abstract boolean isEmpty();
+	
+	/**
+	 * Return string representation for literal content
+	 */
+	public abstract String print();
+	
+	public abstract String toString();
+	
+	/**
+	 * Return an iterator for the literals.
+	 */
+	public Iterator<Literal> iterator() {
+		return new ImListIterator<Literal>(this);
+	}
+	
+	public abstract boolean equals(Object o);
+	
 }

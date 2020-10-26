@@ -1,67 +1,74 @@
-/**
- * An immutable list interface
- * Designed for illustrating reasoning about immutable types
- * 
- * Copyright 2007 Daniel Jackson and MIT
- */
 package immutable;
 
 import java.util.Iterator;
 
-public interface ImList<E> extends Iterable<E> {
-    /**
-     * @param e
-     *            element to add
-     * @requires e != null
-     * @return [e,e_0,...,e_n] where this list = [e_0,...,e_n]
-     */
-    public ImList<E> add(E e);
+/**
+ * General immutable list, not necessarily ordered
+ */
 
-    /**
-     * Get first element of this list.
-     * 
-     * @requires this list is nonempty
-     * @return e_0 where this list = [e_0,...,e_n]
-     */
-    public E first();
-
-    /**
-     * Get list of all elements of this list except for the first.
-     * 
-     * @requires this list is nonempty
-     * @return [e_1,...,e_n] where this list = [e_0,...,e_n]
-     */
-    public ImList<E> rest();
-
-    /**
-     * Remove the first occurrence of an element from the list, if present.
-     * 
-     * @requires e != null
-     * @return [e0,..,e_{i-1], e_{i+1},..,e_n] where i is the minimum index such
-     *         that e_i.equals(e); if no such i, then returns [e_0,..,e_n]
-     *         unchanged.
-     */
-    public ImList<E> remove(E e);
-
-    /**
-     * @requires e != null
-     * @return exists i such that e_i.equals(e) where e_i is ith element of this
-     */
-    public boolean contains(E e);
-
-    /**
-     * @return number of elements in this
-     */
-    public int size();
-
-    /**
-     * @return true if this contains no elements
-     */
-    public boolean isEmpty();
-
-    /**
-     * see Iterable.iterator()
-     */
-    public Iterator<E> iterator();
-
+public interface ImList<E> extends Iterable<E>{
+	
+	/**
+	 * Add element e to the list.
+	 * @param e: element to be added
+	 * @return new immutable list
+	 */
+	public ImList<E> add(E e);
+	
+	/**
+	 * Remove element e from list, if it exists.
+	 * @param e: element to be removed
+	 * @return new immutable list
+	 */
+	public ImList<E> remove(E e);
+	
+	/** 
+	 * Return first element of immutable list
+	 * @return first element
+	 */
+	public E first();
+	
+	/**
+	 * Return all other elements of immutable list
+	 * @return remaining immutable list
+	 */
+	public ImList<E> rest();
+	
+	/**
+	 * Return length of immutable list
+	 * @return length of immutable list
+	 */
+	public int length();
+	
+	/**
+	 * Check whether immutable list is empty
+	 * @return the boolean for that
+	 */
+	public boolean isEmpty();
+	
+	/**
+	 * Return raw string representation of the first element
+	 * @return the string representation
+	 */
+	public String print();
+	
+	/**
+	 * Return string representation of entire list
+	 * @return the string representation
+	 */
+	public String toString();
+	
+	/**
+	 * Return an iterator to iterate through the elements
+	 * @return iterator for elements
+	 */
+	public Iterator<E> iterator();
+	
+	/**
+	 * Check whether this list is equal in VALUE to another list
+	 * @param o: the object to be compared to
+	 * @return whether both lists are the same
+	 */
+	public boolean equals(Object o);
+	
 }

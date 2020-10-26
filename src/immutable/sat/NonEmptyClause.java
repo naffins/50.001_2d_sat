@@ -1,91 +1,127 @@
 package immutable.sat;
 
-import java.util.Iterator;
-import immutable.ImDoubleListIterator;
+import java.util.LinkedList;
 
-public class NonEmptyClause extends Clause {
+public class NonEmptyClause extends Clause{
 	
-	private Short value;
-	private boolean isPositive;
-	private Clause rest;
-	private int size;
-    /**
-     * @param e
-     *            element to add
-     * @requires e != null
-     * @return [e,e_0,...,e_n] where this list = [e_0,...,e_n]
-     */
-	public NonEmptyClause(Short sh, boolean bool, Clause rt) {
-		value = sh;
-		isPositive = bool;
+	private int length = 0;
+	private Clause rest = null;
+	private Literal lit = null;
+	
+	public NonEmptyClause(Literal l, Clause rt) {
+		length = rt.length()+1;
 		rest = rt;
-		size = rt.size()+1;
+		lit = l;
 	}
 	
-    public Clause add(Short sh, boolean bool) {
-    	assert sh != null : "NonEmptyClause.add(null,bool)";
-    	return new NonEmptyClause(sh,bool,this);
-    }
-
-    /**
-     * Get first element of this list.
-     * 
-     * @requires this list is nonempty
-     * @return e_0 where this list = [e_0,...,e_n]
-     */
-    public String first() {
-    	return printer();
-    }
-    public Clause rest() {
-    	return rest;
-    }
-    public Clause eliminate(String e, String inv_e) {
-    	String st_value = printer();
-    	if (st_value.equals(e)) return null;
-    	if (st_value.equals(inv_e)) return rest;
-    	if (rest instanceof EmptyClause) return this;
-    	Clause new_rest = rest.eliminate(e,inv_e);
-    	if (rest==new_rest) return this;
-    	if (new_rest==null) return null;
-    	return new NonEmptyClause(value,isPositive,new_rest);
-    }
-    public boolean contains(String e){
-    	String st_value = printer();
-    	if (st_value.equals(e)) return true;
-    	else return rest.contains(e);
-    }
-    public int size() {
-    	return size;
-    }
-    public boolean isEmpty() {
-    	return false;
-    }
-    
-    public String printer() {
-    	if (isPositive) return value.toString();
-    	return "-" + value.toString();
-    }
-    
-    public boolean equals(Object o) {
-        if (!(o instanceof NonEmptyClause)) return false;
-        NonEmptyClause eq = (NonEmptyClause) o;
-        return toString().equals(eq.toString());
-    }
-    
-    public String toString() {
-        String out = "Clause[";
-        Clause cur = this;
-        for (int i=size();i>0;i--) {
-        	out += cur.printer();
-        	if (i!=1) out += ",";
-        	cur = cur.rest();
-        }
-        out += "]";
-        return out;
-    }
-    
-    public Iterator<String> iterator(){
-    	return new ImDoubleListIterator(this);
-    }
-
+	public Clause add(Literal l) {
+		// If variable id is less than that of first element
+		if (l.value()<lit.value()) return new NonEmptyClause(l,this);
+		
+		// If literal already exists as the first element
+		if (l.equals(lit)) return this;
+		
+		// If literal exists as the first element, but with different sign, delete clause
+		if (l.value().equals(lit.value())) return null;
+		
+		// If rest is empty
+		if (rest.isEmpty()) return new NonEmptyClause(lit,new NonEmptyClause(l,new EmptyClause()));
+		
+		// Add to rest
+		Clause new_rest = rest.add(l);
+		
+		// If nothing changed, return this clause
+		if (new_rest==rest) return this;
+		
+		// If rest clause gets deleted, delete this one too
+		if (new_rest==null) return null;
+		
+		// Otherwise we have a new clause with a modified rest
+		return new NonEmptyClause(lit,new_rest);
+	}
+	
+	public Clause remove(Literal l) {
+		
+		// If value is smaller then it doesn't exist
+		if (l.value()<lit.value()) return this;
+		
+		// If literal already exists as the first element, then delete this clause
+		if (l.equals(lit)) return null;
+				
+		// If literal exists as the first element, but with different sign, delete just the literal
+		if (l.value().equals(lit.value())) return rest;
+		
+		// If rest is empty, then the literal doesn't exist
+		if (rest.isEmpty()) return this;
+		
+		// Remove from rest
+		Clause new_rest = rest.remove(l);
+		
+		// If nothing changed, return this clause
+		if (new_rest==rest) return this;
+				
+		// If rest clause gets deleted, delete this one too
+		if (new_rest==null) return null;
+				
+		// Otherwise we have a new clause with a modified rest
+		return new NonEmptyClause(lit,new_rest);
+	}
+	
+	public boolean contains(Literal l) {
+		if (l.equals(lit)) return true;
+		if (l.value().equals(lit.value())) return false;
+		if (l.value()<lit.value()) return false;
+		return rest.contains(l);
+	}
+	
+	public Literal first() {
+		return lit;
+	}
+	
+	public Clause rest() {
+		return rest;
+	}
+	
+	public LinkedList<Literal> contents(){
+		LinkedList<Literal> contents = new LinkedList<Literal>();
+		Clause current = this;
+		while (!current.isEmpty()) {
+			contents.add(current.first());
+			current = current.rest();
+		}
+		return contents;
+	}
+	
+	public int length() {
+		return length;
+	}
+	
+	public boolean isEmpty() {
+		return false;
+	}
+	
+	public String print() {
+		return lit.print();
+	}
+	
+	public String toString() {
+		String rt = "Clause[";
+		Clause current = this;
+		while (!current.isEmpty()) {
+			rt += current.print();
+			current = current.rest();
+			if (!current.isEmpty()) rt += ",";
+		}
+		rt += "]";
+		return rt;
+	}
+	
+	public boolean equals(Object o) {
+		if (o==this) return true;
+		if (!(o instanceof NonEmptyClause)) return false;
+		NonEmptyClause c = (NonEmptyClause) o;
+		if (!c.lit.equals(lit)) return false;
+		return rest.equals(c.rest());
+	}
+	
 }

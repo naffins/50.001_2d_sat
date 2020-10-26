@@ -1,110 +1,38 @@
-/**
- * Author: dnj, Hank Huang, 6.005 staff
- * Date: March 7, 2009
- * 6.005 Elements of Software Construction
- * (c) 2007-2009, MIT 6.005 Staff
- */
 package immutable.sat;
 
-import immutable.EmptyImList;
-import immutable.ImList;
-import immutable.ImListIterator;
-import immutable.NonEmptyImList;
-
 import java.util.Iterator;
+import java.util.LinkedList;
 
-/**
- * Formula represents an immutable boolean formula in conjunctive normal form,
- * intended to be solved by a SAT solver.
- */
-public class Formula {
-    private final ImList<Clause> clauses;
+import global.Trio;
+import immutable.ImList;
 
-    // Rep invariant:
-    // clauses != null
-    // clauses contains no null elements (ensured by spec of ImList)
-    //
-    // Note: although a formula is intended to be a set,
-    // the list may include duplicate clauses without any problems.
-    // The cost of ensuring that the list has no duplicates is not worth paying.
-    //
-    //
-    // Abstraction function:
-    // The list of clauses c1,c2,...,cn represents
-    // the boolean formula (c1 and c2 and ... and cn)
-    //
-    // For example, if the list contains the two clauses (a,b) and (!c,d), then
-    // the
-    // corresponding formula is (a or b) and (!c or d).
-
-    void checkRep() {
-        assert this.clauses != null : "SATProblem, Rep invariant: clauses non-null";
-    }
-
-    /**
-     * Create a new problem for solving that contains no clauses (that is the
-     * vacuously true problem)
-     * 
-     * @return the true problem
-     */
-    public Formula() {
-        this(new EmptyImList<Clause>());
-        checkRep();
-    }
-
-    /**
-     * Create a new problem for solving that contains a single clause
-     * 
-     * @return the problem with a single clause c
-     */
-    public Formula(Clause c) {
-        this(new NonEmptyImList<Clause>(c));
-    }
-
-    private Formula(ImList<Clause> clauses) {
-        this.clauses = clauses;
-    }
-
-    /**
-     * Add a clause to this problem
-     * 
-     * @return a new problem with the clauses of this, but c added
-     */
-    public Formula addClause(Clause c) {
-        return new Formula(clauses.add(c));
-    }
-
-    /**
-     * Get the clauses of the formula.
-     * 
-     * @return list of clauses
-     */
-    public ImList<Clause> getClauses() {
-        return clauses;
-    }
-
-    /**
-     * Iterator over clauses
-     * 
-     * @return an iterator that yields each clause of this in some arbitrary
-     *         order
-     */
-    public Iterator<Clause> iterator() {
-        return new ImListIterator<Clause>(clauses);
-    }
-
-    /**
-     * 
-     * @return number of clauses in this
-     */
-    public int getSize() {
-        return clauses.size();
-    }
-
-    public String toString() {
-        String result = "Problem[";
-        for (Clause c : clauses)
-            result += "\n" + c;
-        return result + "]";
-    }
+public abstract class Formula implements ImList<Clause>{
+	
+	public abstract Formula add(Clause c);
+	
+	public abstract Formula remove(Clause c);
+	
+	/**
+	 * Remove both positive and negative l from list of clauses 
+	 * @param l: literal with variable id to remove
+	 * @return Pair containing new formula and corresponding smallest clause
+	 */
+	public abstract Trio<Formula,LinkedList<Literal>,Clause> eliminate(Literal l);
+	
+	public abstract Clause first();
+	
+	public abstract Formula rest();
+	
+	public abstract int length();
+	
+	public abstract boolean isEmpty();
+	
+	public abstract String print();
+	
+	public abstract String toString();
+	
+	public abstract Iterator<Clause> iterator();
+	
+	public abstract boolean equals(Object o);
+	
 }

@@ -1,72 +1,52 @@
-/**
- * An immutable list
- * Designed for illustrating reasoning about immutable types
- * 
- * Copyright 2007 Daniel Jackson and MIT
- */
 package immutable;
 
 import java.util.Iterator;
 
-public class EmptyImList<E> implements ImList<E> {
-    /**
-     * abstraction function A(this) = <>, the empty list
-     * 
-     * rep invariant = true
-     */
+public class EmptyImList<E> implements ImList<E>{
 
-    public EmptyImList() {
-    }
-
-    public ImList<E> add(E e) {
-        assert e != null : "EmptyList.add(null)";
-        return new NonEmptyImList<E>(e);
-    }
-
-    public ImList<E> remove(E e) {
-        assert e != null : "EmptyList.remove(null)";
-        return this;
-    }
-
-    public E first() {
-        assert false : "EmptyList.first";
-        return null;
-    }
-
-    public ImList<E> rest() {
-        assert false : "EmptyList.rest";
-        return null;
-    }
-
-    public boolean contains(E e) {
-        assert e != null : "EmptyList.contains(null)";
-        return false;
-    }
-
-    public int size() {
-        return 0;
-    }
-
-    public boolean isEmpty() {
-        return true;
-    }
-
-    public Iterator<E> iterator() {
-        return new ImListIterator<E>(this);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        return o instanceof EmptyImList;
-    }
-
-    @Override
-    public int hashCode() {
-        return 0;
-    }
-
-    @Override
-    public String toString() {
-        return "[]";
-    }
+	private int length = 0;
+	
+	public EmptyImList(){}
+	
+	public ImList<E> add(E e){
+		return new NonEmptyImList<E>(e,this);
+	}
+	
+	public ImList<E> remove(E e){
+		return this;
+	}
+	
+	public E first() {
+		return null;
+	}
+	
+	public ImList<E> rest() {
+		return null;
+	}
+	
+	public int length() {
+		return length;
+	}
+	
+	public boolean isEmpty() {
+		return true;
+	}
+	
+	public String print() {
+		return null;
+	}
+	
+	public String toString() {
+		return "ImList[]";
+	}
+	
+	public Iterator<E> iterator(){
+		return new ImListIterator<E>(this);
+	}
+	
+	public boolean equals(Object o) {
+		if (o==this) return true;
+		return o instanceof EmptyImList;
+	}
+	
 }
